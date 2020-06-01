@@ -1,0 +1,28 @@
+{
+  "name": "eureka/component-curl",
+  "description": "Component Curl & Http Client PSR implementation. ",
+  "type": "library",
+  "license": "MIT",
+  "prefer-stable": true,
+
+  "authors": [
+    {
+      "name": "Romain Cottard",
+      "role": "Developer"
+    }
+  ],
+
+  "autoload": {
+    "psr-4": {
+      "Eureka\\Component\\Curl\\": "./src"
+    }
+  },
+
+  "require": {
+    "ext-curl": "*",
+
+    "psr/http-client": "^1.0",
+    "psr/http-factory": "^1.0",
+    "nyholm/psr7": "^1.1.0"
+  }
+}
