@@ -23,14 +23,14 @@ class Curl
     /** @var resource $connection Curl connection resource */
     protected $connection = null;
 
-    /** @var string $message Message data */
-    protected $message = '';
+    /** @var string|null $message Message data */
+    protected ?string $message = null;
 
     /** @var string $curlInfo Curl info data */
-    protected $curlInfo = '';
+    protected string $curlInfo = '';
 
     /** @var array $defaultOptions Default options used */
-    protected $defaultOptions = [];
+    protected array $defaultOptions = [];
 
     /**
      * Class constructor
@@ -49,6 +49,8 @@ class Curl
      * @param null|string $url Url for connection.
      * @return $this
      * @throws CurlInitException
+     *
+     * @codeCoverageIgnore
      */
     public function init(string $url = null): self
     {
@@ -69,6 +71,8 @@ class Curl
      * Close connection.
      *
      * @return $this
+     *
+     * @codeCoverageIgnore
      */
     public function close(): self
     {
@@ -83,6 +87,8 @@ class Curl
      * Execute cURL command.
      *
      * @return bool|string
+     *
+     * @codeCoverageIgnore
      */
     public function exec()
     {
@@ -96,6 +102,8 @@ class Curl
      * Get last cURL error message.
      *
      * @return string Error message.
+     *
+     * @codeCoverageIgnore
      */
     public function getError(): string
     {
@@ -113,6 +121,8 @@ class Curl
      * Get last cURL error number.
      *
      * @return int Error number.
+     *
+     * @codeCoverageIgnore
      */
     public function getErrorNumber()
     {
@@ -123,6 +133,8 @@ class Curl
      * Return curl infos stored of exist, else wrap curl_getinfo()
      *
      * @return array Array of data about previous curl request.
+     *
+     * @codeCoverageIgnore
      */
     public function getInfo(): array
     {
@@ -138,6 +150,8 @@ class Curl
      * (success: no error & http code is 2XX or 3XX)
      *
      * @return bool
+     *
+     * @codeCoverageIgnore
      */
     public function isSuccess()
     {
@@ -174,6 +188,8 @@ class Curl
      * @param array|string $name Name or array of options to set.
      * @param null|mixed $value Value to set.
      * @return $this
+     *
+     * @codeCoverageIgnore
      */
     public function setOptionDefault($name, $value = null)
     {
@@ -194,6 +210,8 @@ class Curl
      * @return $this
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
+     *
+     * @codeCoverageIgnore
      */
     public function setOption($name, $value = null)
     {
@@ -236,6 +254,8 @@ class Curl
      * @param array|string $data An array of key => value pairs, or an urlencoded string
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
+     *
+     * @codeCoverageIgnore
      */
     public function setPostData($data)
     {
@@ -249,10 +269,12 @@ class Curl
      * @return $this
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
+     *
+     * @codeCoverageIgnore
      */
-    public function setUrl($url)
+    public function setUrl(string $url)
     {
-        $this->setOption(CURLOPT_URL, (string) $url);
+        $this->setOption(CURLOPT_URL, $url);
 
         return $this;
     }
@@ -265,10 +287,12 @@ class Curl
      * @return $this
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
+     *
+     * @codeCoverageIgnore
      */
-    public function setReturn($return)
+    public function setReturn(bool $return)
     {
-        $this->setOption(CURLOPT_RETURNTRANSFER, (bool) $return);
+        $this->setOption(CURLOPT_RETURNTRANSFER, $return);
 
         return $this;
     }
@@ -281,8 +305,10 @@ class Curl
      * @throws Exception\CurlUnexpectedValueException
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
+     *
+     * @codeCoverageIgnore
      */
-    public function setMethod($method)
+    public function setMethod(string $method)
     {
         $method = strtoupper($method);
 

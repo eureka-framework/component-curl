@@ -21,19 +21,24 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * Class HttpClient
+ *
+ * @author Romain Cottard
+ */
 class HttpClient implements ClientInterface
 {
     /** @var string[][] */
-    private $responseHeaders = [];
+    private array $responseHeaders = [];
 
     /** @var Psr17Factory $httpFactory */
-    private $httpFactory;
+    private Psr17Factory $httpFactory;
 
     /** @var int $timeout */
-    private $timeout;
+    private int $timeout;
 
     /** @var int $connectTimeout */
-    private $connectTimeout;
+    private int $connectTimeout;
 
     /**
      * HttpClient constructor.
@@ -57,6 +62,8 @@ class HttpClient implements ClientInterface
      * @param int $timeout
      * @return ResponseInterface
      * @throws ClientExceptionInterface
+     *
+     * @codeCoverageIgnore
      */
     public function sendRequest(RequestInterface $request, int $connectTimeout = 30, int $timeout = 60): ResponseInterface
     {
@@ -106,6 +113,8 @@ class HttpClient implements ClientInterface
      * @param resource $resource Curl resource
      * @param string $header
      * @return int
+     *
+     * @codeCoverageIgnore
      */
     public function readResponseHeader($resource, string $header): int
     {
@@ -132,6 +141,8 @@ class HttpClient implements ClientInterface
      * @throws Exception\CurlInitException
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlUnexpectedValueException
+     *
+     * @codeCoverageIgnore
      */
     private function getCurl(RequestInterface $request, $streamResource): Curl
     {
@@ -176,6 +187,8 @@ class HttpClient implements ClientInterface
      * @param int $status
      * @param StreamInterface $stream
      * @return ResponseInterface
+     *
+     * @codeCoverageIgnore
      */
     private function createResponse(int $status, StreamInterface $stream): ResponseInterface
     {
