@@ -26,8 +26,8 @@ class Curl
     /** @var string|null $message Message data */
     protected ?string $message = null;
 
-    /** @var string $curlInfo Curl info data */
-    protected string $curlInfo = '';
+    /** @var array $curlInfo Curl info data */
+    protected array $curlInfo = [];
 
     /** @var array $defaultOptions Default options used */
     protected array $defaultOptions = [];
