@@ -20,16 +20,16 @@ use Eureka\Component\Curl\Exception\CurlInitException;
  */
 class Curl
 {
-    /** @var resource $connection Curl connection resource */
-    protected $connection = null;
+    /** @var resource|null $connection Curl connection resource */
+    protected /*?\CurlHandle*/ $connection = null;
 
     /** @var string|null $message Message data */
     protected ?string $message = null;
 
-    /** @var array $curlInfo Curl info data */
+    /** @var array<string[][]|float|int|string|null> $curlInfo Curl info data */
     protected array $curlInfo = [];
 
-    /** @var array $defaultOptions Default options used */
+    /** @var array<mixed> $defaultOptions Default options used */
     protected array $defaultOptions = [];
 
     /**
@@ -46,7 +46,7 @@ class Curl
     /**
      * Initialize curl connection.
      *
-     * @param null|string $url Url for connection.
+     * @param string|null $url Url for connection.
      * @return $this
      * @throws CurlInitException
      *
@@ -54,15 +54,13 @@ class Curl
      */
     public function init(string $url = null): self
     {
-        if (empty($url)) {
-            $this->connection = curl_init();
-        } else {
-            $this->connection = curl_init($url);
+        $connection = empty($url) ? curl_init() : curl_init($url);
+
+        if ($connection === false) {
+            throw new CurlInitException('Initialization failed !');
         }
 
-        if ($this->connection === false) {
-            throw new CurlInitException(__METHOD__ . '|Initialization failed !');
-        }
+        $this->connection = $connection;
 
         return $this;
     }
@@ -71,14 +69,13 @@ class Curl
      * Close connection.
      *
      * @return $this
+     * @throws CurlInitException
      *
      * @codeCoverageIgnore
      */
     public function close(): self
     {
-        if (!empty($this->connection)) {
-            curl_close($this->connection);
-        }
+        curl_close($this->getConnection());
 
         return $this;
     }
@@ -87,13 +84,18 @@ class Curl
      * Execute cURL command.
      *
      * @return bool|string
+     * @throws CurlInitException
      *
      * @codeCoverageIgnore
      */
     public function exec()
     {
-        $result         = curl_exec($this->connection);
-        $this->curlInfo = curl_getinfo($this->connection);
+        $result = curl_exec($this->getConnection());
+        $info   = curl_getinfo($this->getConnection());
+
+        if ($info !== false) {
+            $this->curlInfo = (array) $info;
+        }
 
         return $result;
     }
@@ -102,6 +104,7 @@ class Curl
      * Get last cURL error message.
      *
      * @return string Error message.
+     * @throws CurlInitException
      *
      * @codeCoverageIgnore
      */
@@ -114,35 +117,37 @@ class Curl
             return $message;
         }
 
-        return curl_error($this->connection);
+        return curl_error($this->getConnection());
     }
 
     /**
      * Get last cURL error number.
      *
      * @return int Error number.
+     * @throws CurlInitException
      *
      * @codeCoverageIgnore
      */
-    public function getErrorNumber()
+    public function getErrorNumber(): int
     {
-        return curl_errno($this->connection);
+        return curl_errno($this->getConnection());
     }
 
     /**
      * Return curl infos stored of exist, else wrap curl_getinfo()
      *
-     * @return array Array of data about previous curl request.
+     * @return array<string[][]|float|int|string|null> Array of data about previous curl request.
+     * @throws CurlInitException
      *
      * @codeCoverageIgnore
      */
     public function getInfo(): array
     {
-        if (is_array($this->curlInfo)) {
+        if (!empty($this->curlInfo)) {
             return $this->curlInfo;
         }
 
-        return curl_getinfo($this->connection);
+        return (array) curl_getinfo($this->getConnection());
     }
 
     /**
@@ -150,33 +155,35 @@ class Curl
      * (success: no error & http code is 2XX or 3XX)
      *
      * @return bool
+     * @throws CurlInitException
      *
      * @codeCoverageIgnore
      */
-    public function isSuccess()
+    public function isSuccess(): bool
     {
         $info = $this->getInfo();
 
-        switch (true) {
-            case false === $info:
-                $this->message = 'Cannot get information from connection!';
-                break;
-            case !is_array($info):
-                $this->message = 'Curl information is not an array!';
-                break;
-            case !isset($info['http_code']):
-                $this->message = 'No information about "http_code"!';
-                break;
-            case substr($info['http_code'], 0, 1) != '2' && substr($info['http_code'], 0, 1) != '3':
-                $this->message = '"http_code" is not a 2XX or 3XX status code! http-code: ' . $info['http_code'];
-                break;
-            // 0 or -1 : No size info
-            case (int) $info['download_content_length'] > 0 && (int) $info['download_content_length'] !== (int) $info['size_download']:
-                $this->message = 'Transfer did not complete!';
-                break;
-            default:
-                $this->message = null;
-                break;
+        if ($this->getErrorNumber() > 0) {
+            $this->message = $this->getError();
+            return false;
+        }
+
+        if (!isset($info['http_code']) || !is_string($info['http_code'])) {
+            $this->message = 'No information about "http_code"!';
+            return false;
+        }
+
+        $httpCodeFirstNumber = substr($info['http_code'], 0, 1);
+        if (!in_array($httpCodeFirstNumber, ['2', '3'])) {
+            $this->message = '"http_code" is not a 2XX or 3XX status code! http-code: ' . $info['http_code'];
+            return false;
+        }
+
+        $length = (int) ($info['download_content_length'] ?? 0);
+        $size   = (int) ($info['size_download'] ?? 0);
+        if ($length !== $size) {
+            $this->message = 'Transfer did not complete!';
+            return false;
         }
 
         return (empty($this->message));
@@ -185,15 +192,15 @@ class Curl
     /**
      * Override default option (array or name/value)
      *
-     * @param array|string $name Name or array of options to set.
-     * @param null|mixed $value Value to set.
+     * @param array<mixed>|string $name Name or array of options to set.
+     * @param mixed $value Value to set.
      * @return $this
      *
      * @codeCoverageIgnore
      */
-    public function setOptionDefault($name, $value = null)
+    public function setOptionDefault($name, $value = null): self
     {
-        if (is_array($name) && null === $value) {
+        if (is_array($name)) {
             $this->defaultOptions = $name + $this->defaultOptions;
         } else {
             $this->defaultOptions[$name] = $value;
@@ -205,44 +212,50 @@ class Curl
     /**
      * Set option (array or name/value)
      *
-     * @param array|string $name Name or array of options to set.
-     * @param null|mixed $value Value to set.
+     * @param array<mixed>|int $name Name or array of options to set.
+     * @param mixed $value Value to set.
      * @return $this
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
      *
      * @codeCoverageIgnore
      */
-    public function setOption($name, $value = null)
+    public function setOption($name, $value = null): self
     {
-        if (!is_resource($this->connection)) {
-            $this->init();
+        if (is_array($name)) {
+            return $this->setOptions($name);
         }
 
         $openBasedir = ini_get('openBasedir');
 
-        if (is_array($name) && !empty($name) && null === $value) {
-            if (isset($name[CURLOPT_FOLLOWLOCATION]) && (!empty($openBasedir))) {
-                $name[CURLOPT_FOLLOWLOCATION] = false;
-            }
+        if ($name == CURLOPT_FOLLOWLOCATION && (!empty($openBasedir))) {
+            $value = false;
+        }
 
-            if (false === curl_setopt_array($this->connection, $name)) {
-                $error = $this->getError();
-                $errno = $this->getErrorNumber();
-                $this->close();
-                throw new Exception\CurlOptionException(__METHOD__ . '|Set option array failed ! (error: ' . $error . ')', $errno);
-            }
-        } else {
-            if ($name == CURLOPT_FOLLOWLOCATION && (!empty($openBasedir))) {
-                $value = false;
-            }
+        if (false === curl_setopt($this->getConnection(), $name, $value)) {
+            $error = $this->getError();
+            $errno = $this->getErrorNumber();
+            $this->close();
+            throw new Exception\CurlOptionException("Set option failed ! (error: $error)", $errno);
+        }
 
-            if (false === curl_setopt($this->connection, $name, $value)) {
-                $error = $this->getError();
-                $errno = $this->getErrorNumber();
-                $this->close();
-                throw new Exception\CurlOptionException(__METHOD__ . '|Set option failed ! (error: ' . $error . ')', $errno);
-            }
+        return $this;
+    }
+
+    /**
+     * Set option (array or name/value)
+     *
+     * @param array<mixed> $options Array of options to set.
+     * @return $this
+     * @throws Exception\CurlOptionException
+     * @throws Exception\CurlInitException
+     *
+     * @codeCoverageIgnore
+     */
+    public function setOptions(array $options): self
+    {
+        foreach ($options as $name => $value) {
+            $this->setOption($name, $value);
         }
 
         return $this;
@@ -251,15 +264,16 @@ class Curl
     /**
      * Sets the POST data
      *
-     * @param array|string $data An array of key => value pairs, or an urlencoded string
+     * @param array<mixed>|string $data An array of key => value pairs, or an urlencoded string
+     * @return $this
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
      *
      * @codeCoverageIgnore
      */
-    public function setPostData($data)
+    public function setPostData($data): self
     {
-        $this->setOption(CURLOPT_POSTFIELDS, $data);
+        return $this->setOption(CURLOPT_POSTFIELDS, $data);
     }
 
     /**
@@ -272,11 +286,9 @@ class Curl
      *
      * @codeCoverageIgnore
      */
-    public function setUrl(string $url)
+    public function setUrl(string $url): self
     {
-        $this->setOption(CURLOPT_URL, $url);
-
-        return $this;
+        return $this->setOption(CURLOPT_URL, $url);
     }
 
     /**
@@ -290,11 +302,9 @@ class Curl
      *
      * @codeCoverageIgnore
      */
-    public function setReturn(bool $return)
+    public function setReturn(bool $return): self
     {
-        $this->setOption(CURLOPT_RETURNTRANSFER, $return);
-
-        return $this;
+        return $this->setOption(CURLOPT_RETURNTRANSFER, $return);
     }
 
     /**
@@ -308,7 +318,7 @@ class Curl
      *
      * @codeCoverageIgnore
      */
-    public function setMethod(string $method)
+    public function setMethod(string $method): self
     {
         $method = strtoupper($method);
 
@@ -328,17 +338,33 @@ class Curl
             case 'DELETE':
                 $options[CURLOPT_CUSTOMREQUEST] = 'DELETE';
                 break;
+            case 'PATCH':
+                $options[CURLOPT_CUSTOMREQUEST] = 'PATCH';
+                break;
             case 'HEAD':
                 $options[CURLOPT_NOBODY] = true;
                 break;
             case 'GET':
                 break;
             default:
-                throw new Exception\CurlUnexpectedValueException("Set method failed: method ${method} is not supported");
+                throw new Exception\CurlUnexpectedValueException(
+                    "Set method failed: method $method is not supported"
+                );
         }
 
-        $this->setOption($options);
+        return $this->setOption($options);
+    }
 
-        return $this;
+    /**
+     * @return resource
+     * @throws CurlInitException
+     */
+    private function getConnection()
+    {
+        if (empty($this->connection)) {
+            throw new CurlInitException('Curl connection has not be initialized or initialization failed!');
+        }
+
+        return $this->connection;
     }
 }

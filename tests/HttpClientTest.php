@@ -25,9 +25,9 @@ class HttpClientTest extends TestCase
     /**
      * @return void
      */
-    public function testCanInstantiateHttpClient()
+    public function testICanInstantiateHttpClient()
     {
-        $client = new HttpClient();
+        $client = new HttpClient(1, 1);
 
         $this->assertInstanceOf(ClientInterface::class, $client);
     }

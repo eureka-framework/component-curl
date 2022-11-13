@@ -28,28 +28,27 @@ use Psr\Http\Message\StreamInterface;
  */
 class HttpClient implements ClientInterface
 {
+    public const USER_AGENT_BROWSER_FIREFOX = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0';
+    public const USER_AGENT_CLI_EUREKA      = 'eureka/curl 2.0';
+
     /** @var string[][] */
     private array $responseHeaders = [];
 
     /** @var Psr17Factory $httpFactory */
     private Psr17Factory $httpFactory;
 
-    /** @var int $timeout */
     private int $timeout;
-
-    /** @var int $connectTimeout */
     private int $connectTimeout;
+    private string $userAgent;
 
-    /**
-     * HttpClient constructor.
-     *
-     * @param int $timeout
-     * @param int $connectTimeout
-     */
-    public function __construct(int $timeout = 10, int $connectTimeout = 10)
-    {
+    public function __construct(
+        int $timeout = 3,
+        int $connectTimeout = 1,
+        string $userAgent = self::USER_AGENT_BROWSER_FIREFOX
+    ) {
         $this->timeout        = $timeout;
         $this->connectTimeout = $connectTimeout;
+        $this->userAgent      = $userAgent;
 
         $this->httpFactory    = new Psr17Factory();
     }
@@ -65,10 +64,17 @@ class HttpClient implements ClientInterface
      *
      * @codeCoverageIgnore
      */
-    public function sendRequest(RequestInterface $request, int $connectTimeout = 30, int $timeout = 60): ResponseInterface
-    {
+    public function sendRequest(
+        RequestInterface $request,
+        int $connectTimeout = 30,
+        int $timeout = 60
+    ): ResponseInterface {
         try {
             $streamResource = fopen('php://temp', 'w+');
+
+            if ($streamResource === false) {
+                throw new HttpClientException('Cannot open stream resource for HttpClient', 1001);
+            }
 
             $curl = $this->getCurl($request, $streamResource);
 
@@ -89,7 +95,12 @@ class HttpClient implements ClientInterface
                 fclose($streamResource);
 
                 throw new HttpClientException(
-                    sprintf('Execution failed ! (error: %s, code: %d, infos: %s)', $error, $errno, json_encode($curl->getInfo())),
+                    sprintf(
+                        'Execution failed ! (error: %s, code: %d, infos: %s)',
+                        $error,
+                        $errno,
+                        json_encode($curl->getInfo())
+                    ),
                     $errno
                 );
             }
@@ -161,7 +172,7 @@ class HttpClient implements ClientInterface
             ->setOption(CURLOPT_HEADER, true)
             ->setOption(CURLOPT_HEADERFUNCTION, [$this, 'readResponseHeader'])
             ->setOption(CURLOPT_FOLLOWLOCATION, true)
-            ->setOption(CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0')
+            ->setOption(CURLOPT_USERAGENT, $this->userAgent)
         ;
 
         //~ Request headers
