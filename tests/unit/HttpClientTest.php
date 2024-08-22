@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Eureka\Component\Curl\Tests;
+namespace Eureka\Component\Curl\Tests\Unit;
 
 use Eureka\Component\Curl\HttpClient;
 use PHPUnit\Framework\TestCase;

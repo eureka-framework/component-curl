@@ -9,10 +9,9 @@
 
 declare(strict_types=1);
 
-namespace Eureka\Component\Curl\Tests;
+namespace Eureka\Component\Curl\Tests\Unit;
 
 use Eureka\Component\Curl\Curl;
-use Eureka\Component\Curl\Exception\CurlInitException;
 use PHPUnit\Framework\TestCase;
 
 /**

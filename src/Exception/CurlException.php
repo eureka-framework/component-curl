@@ -16,6 +16,4 @@ namespace Eureka\Component\Curl\Exception;
  *
  * @author Romain Cottard
  */
-class CurlException extends \Exception
-{
-}
+class CurlException extends \Exception {}

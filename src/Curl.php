@@ -20,10 +20,8 @@ use Eureka\Component\Curl\Exception\CurlInitException;
  */
 class Curl
 {
-    /** @var resource|null $connection Curl connection resource */
-    protected /*?\CurlHandle*/ $connection = null;
+    protected \CurlHandle|null $connection = null;
 
-    /** @var string|null $message Message data */
     protected ?string $message = null;
 
     /** @var array<string[][]|float|int|string|null> $curlInfo Curl info data */
@@ -88,7 +86,7 @@ class Curl
      *
      * @codeCoverageIgnore
      */
-    public function exec()
+    public function exec(): bool|string
     {
         $result = curl_exec($this->getConnection());
         $info   = curl_getinfo($this->getConnection());
@@ -186,19 +184,19 @@ class Curl
             return false;
         }
 
-        return (empty($this->message));
+        return empty($this->message);
     }
 
     /**
      * Override default option (array or name/value)
      *
      * @param array<mixed>|string $name Name or array of options to set.
-     * @param mixed $value Value to set.
+     * @param mixed|null $value Value to set.
      * @return $this
      *
      * @codeCoverageIgnore
      */
-    public function setOptionDefault($name, $value = null): self
+    public function setOptionDefault(array|string $name, mixed $value = null): self
     {
         if (is_array($name)) {
             $this->defaultOptions = $name + $this->defaultOptions;
@@ -213,14 +211,14 @@ class Curl
      * Set option (array or name/value)
      *
      * @param array<mixed>|int $name Name or array of options to set.
-     * @param mixed $value Value to set.
+     * @param mixed|null $value Value to set.
      * @return $this
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
      *
      * @codeCoverageIgnore
      */
-    public function setOption($name, $value = null): self
+    public function setOption(array|int $name, mixed $value = null): self
     {
         if (is_array($name)) {
             return $this->setOptions($name);
@@ -271,7 +269,7 @@ class Curl
      *
      * @codeCoverageIgnore
      */
-    public function setPostData($data): self
+    public function setPostData(array|string $data): self
     {
         return $this->setOption(CURLOPT_POSTFIELDS, $data);
     }
@@ -348,7 +346,7 @@ class Curl
                 break;
             default:
                 throw new Exception\CurlUnexpectedValueException(
-                    "Set method failed: method $method is not supported"
+                    "Set method failed: method $method is not supported",
                 );
         }
 
@@ -356,10 +354,10 @@ class Curl
     }
 
     /**
-     * @return resource
+     * @return \CurlHandle
      * @throws CurlInitException
      */
-    private function getConnection()
+    private function getConnection(): \CurlHandle
     {
         if (empty($this->connection)) {
             throw new CurlInitException('Curl connection has not be initialized or initialization failed!');

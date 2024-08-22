@@ -44,7 +44,7 @@ class HttpClient implements ClientInterface
     public function __construct(
         int $timeout = 3,
         int $connectTimeout = 1,
-        string $userAgent = self::USER_AGENT_BROWSER_FIREFOX
+        string $userAgent = self::USER_AGENT_BROWSER_FIREFOX,
     ) {
         $this->timeout        = $timeout;
         $this->connectTimeout = $connectTimeout;
@@ -67,7 +67,7 @@ class HttpClient implements ClientInterface
     public function sendRequest(
         RequestInterface $request,
         int $connectTimeout = 30,
-        int $timeout = 60
+        int $timeout = 60,
     ): ResponseInterface {
         try {
             $streamResource = fopen('php://temp', 'w+');
@@ -99,9 +99,9 @@ class HttpClient implements ClientInterface
                         'Execution failed ! (error: %s, code: %d, infos: %s)',
                         $error,
                         $errno,
-                        json_encode($curl->getInfo())
+                        json_encode($curl->getInfo()),
                     ),
-                    $errno
+                    $errno,
                 );
             }
 
