@@ -18,6 +18,4 @@ use Psr\Http\Client\ClientExceptionInterface;
  *
  * @author Romain Cottard
  */
-class HttpClientException extends \Exception implements ClientExceptionInterface
-{
-}
+class HttpClientException extends \Exception implements ClientExceptionInterface {}

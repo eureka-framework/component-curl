@@ -16,6 +16,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ```
 
 ----
+## [3.0.0] - 2024-08-22
+[3.0.0]: https://github.com/eureka-framework/component-curl/compare/2.2.0...3.0.0
+### Changed
+- Support PHP 8.3
+- Now use `\CurlHandle` as resource connection
+- Fix some code style
+- Replace PHPCS by php-cs-fixer
+- Move unit test to subdirectory `unit/`
+- Dev dependencies update
+- Update CI workflow
+- Update Makefile & Readme
+### Remove
+- Drop support of PHP 7.4 & PHP 8.0
+
+----
+
 ## [2.2.0] - 2023-03-10
 ### Changed
 - Support PHP 8.2
