@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ```
 
 ----
+## [3.1.0] - 2025-05-16
+[3.1.0]: https://github.com/eureka-framework/component-curl/compare/3.0.0...3.1.0
+### Added
+- Support PHP 8.4
+### Changed
+- Update tests
+- Update makefile
+- Update CI workflow
+
 ## [3.0.0] - 2024-08-22
 [3.0.0]: https://github.com/eureka-framework/component-curl/compare/2.2.0...3.0.0
 ### Changed

@@ -27,7 +27,11 @@ class CurlTest extends TestCase
     public function testCanInstantiateHttpClient()
     {
         $curl = new Curl();
+        $curl->init('https://example.com');
+        $curl->setMethod('HEAD');
+        $curl->setOption(CURLOPT_RETURNTRANSFER, false);
+        $isSuccess = $curl->exec();
 
-        $this->assertInstanceOf(Curl::class, $curl);
+        $this->assertTrue($isSuccess);
     }
 }

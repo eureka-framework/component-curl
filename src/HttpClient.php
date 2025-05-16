@@ -61,8 +61,6 @@ class HttpClient implements ClientInterface
      * @param int $timeout
      * @return ResponseInterface
      * @throws ClientExceptionInterface
-     *
-     * @codeCoverageIgnore
      */
     public function sendRequest(
         RequestInterface $request,
@@ -124,8 +122,6 @@ class HttpClient implements ClientInterface
      * @param resource $resource Curl resource
      * @param string $header
      * @return int
-     *
-     * @codeCoverageIgnore
      */
     public function readResponseHeader($resource, string $header): int
     {
@@ -152,8 +148,6 @@ class HttpClient implements ClientInterface
      * @throws Exception\CurlInitException
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlUnexpectedValueException
-     *
-     * @codeCoverageIgnore
      */
     private function getCurl(RequestInterface $request, $streamResource): Curl
     {
@@ -186,7 +180,7 @@ class HttpClient implements ClientInterface
         }
 
         //~ Request body if necessary
-        if ($request->getMethod() === 'POST' && $request->getBody() instanceof StreamInterface) {
+        if ($request->getMethod() === 'POST') {
             $request->getBody()->rewind();
             $curl->setOption(CURLOPT_POSTFIELDS, $request->getBody()->getContents());
         }
@@ -198,8 +192,6 @@ class HttpClient implements ClientInterface
      * @param int $status
      * @param StreamInterface $stream
      * @return ResponseInterface
-     *
-     * @codeCoverageIgnore
      */
     private function createResponse(int $status, StreamInterface $stream): ResponseInterface
     {

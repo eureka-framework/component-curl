@@ -36,7 +36,7 @@ class Curl
      * @param null|string $url
      * @throws Exception\CurlInitException
      */
-    public function __construct(string $url = null)
+    public function __construct(string|null $url = null)
     {
         $this->init($url);
     }
@@ -47,10 +47,8 @@ class Curl
      * @param string|null $url Url for connection.
      * @return $this
      * @throws CurlInitException
-     *
-     * @codeCoverageIgnore
      */
-    public function init(string $url = null): self
+    public function init(string|null $url = null): self
     {
         $connection = empty($url) ? curl_init() : curl_init($url);
 
@@ -68,8 +66,6 @@ class Curl
      *
      * @return $this
      * @throws CurlInitException
-     *
-     * @codeCoverageIgnore
      */
     public function close(): self
     {
@@ -83,8 +79,6 @@ class Curl
      *
      * @return bool|string
      * @throws CurlInitException
-     *
-     * @codeCoverageIgnore
      */
     public function exec(): bool|string
     {
@@ -136,8 +130,6 @@ class Curl
      *
      * @return array<string[][]|float|int|string|null> Array of data about previous curl request.
      * @throws CurlInitException
-     *
-     * @codeCoverageIgnore
      */
     public function getInfo(): array
     {
@@ -154,8 +146,6 @@ class Curl
      *
      * @return bool
      * @throws CurlInitException
-     *
-     * @codeCoverageIgnore
      */
     public function isSuccess(): bool
     {
@@ -215,8 +205,6 @@ class Curl
      * @return $this
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
-     *
-     * @codeCoverageIgnore
      */
     public function setOption(array|int $name, mixed $value = null): self
     {
@@ -313,8 +301,6 @@ class Curl
      * @throws Exception\CurlUnexpectedValueException
      * @throws Exception\CurlOptionException
      * @throws Exception\CurlInitException
-     *
-     * @codeCoverageIgnore
      */
     public function setMethod(string $method): self
     {
