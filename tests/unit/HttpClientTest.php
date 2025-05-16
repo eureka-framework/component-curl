@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Eureka\Component\Curl\Tests\Unit;
 
 use Eureka\Component\Curl\HttpClient;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 
@@ -27,8 +28,16 @@ class HttpClientTest extends TestCase
      */
     public function testICanInstantiateHttpClient()
     {
-        $client = new HttpClient(1, 1);
+        //~ Arrange
+        $factory = new Psr17Factory();
+        $request = $factory->createRequest('GET', 'https://example.com');
 
-        $this->assertInstanceOf(ClientInterface::class, $client);
+        //~ Act
+        $client   = new HttpClient(1, 1);
+        $response = $client->sendRequest($request);
+
+        //~ Assert
+
+        $this->assertSame(200, $response->getStatusCode());
     }
 }
