@@ -64,9 +64,8 @@ class Curl
     /**
      * Close connection.
      *
-     * @return $this
+     * @deprecated
      */
-    #[\Deprecated]
     public function close(): self
     {
         return $this;
