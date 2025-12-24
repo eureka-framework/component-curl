@@ -20,7 +20,7 @@ use Eureka\Component\Curl\Exception\CurlInitException;
  */
 class Curl
 {
-    protected \CurlHandle|null $connection = null;
+    protected ?\CurlHandle $connection = null;
 
     protected ?string $message = null;
 
@@ -36,7 +36,7 @@ class Curl
      * @param null|string $url
      * @throws Exception\CurlInitException
      */
-    public function __construct(string|null $url = null)
+    public function __construct(?string $url = null)
     {
         $this->init($url);
     }
@@ -48,7 +48,7 @@ class Curl
      * @return $this
      * @throws CurlInitException
      */
-    public function init(string|null $url = null): self
+    public function init(?string $url = null): self
     {
         $connection = empty($url) ? curl_init() : curl_init($url);
 
@@ -64,13 +64,10 @@ class Curl
     /**
      * Close connection.
      *
-     * @return $this
-     * @throws CurlInitException
+     * @deprecated
      */
     public function close(): self
     {
-        curl_close($this->getConnection());
-
         return $this;
     }
 
@@ -221,7 +218,6 @@ class Curl
         if (false === curl_setopt($this->getConnection(), $name, $value)) {
             $error = $this->getError();
             $errno = $this->getErrorNumber();
-            $this->close();
             throw new Exception\CurlOptionException("Set option failed ! (error: $error)", $errno);
         }
 

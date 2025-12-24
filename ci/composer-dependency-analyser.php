@@ -7,4 +7,5 @@ $config = new Configuration();
 return $config
     ->addPathToScan(__DIR__ . '/../src', isDev: false)
     ->addPathToScan(__DIR__ . '/../tests', isDev: true)
+    ->addPathToScan(__DIR__ . '/../tests', isDev: true)
 ;
