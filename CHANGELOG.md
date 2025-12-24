@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ```
 
 ----
+## [4.0.0] - 2025-12-24
+[4.0.0]: https://github.com/eureka-framework/component-curl/compare/3.1.0...4.0.0
+### Added
+- Add PHP 8.5 support
+### Removed
+- Drop PHP 7.4 support
+- Drop PHP 8.1 support
+- Drop PHP 8.2 support
+### Changed
+- Use PER Code Style 3.0
+- Update CI config
+- Deprecated usage for Curl::close() (no effect since PHP 8.0)
+
+----
 ## [3.1.0] - 2025-05-16
 [3.1.0]: https://github.com/eureka-framework/component-curl/compare/3.0.0...3.1.0
 ### Added

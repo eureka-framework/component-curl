@@ -29,22 +29,23 @@
   },
 
   "require": {
-    "php": "8.1.*||8.2.*||8.3.*||8.4.*",
+    "php": ">=8.3",
     "ext-curl": "*",
     "ext-json": "*",
 
-    "nyholm/psr7": "^1.5",
+    "nyholm/psr7": "^1.0",
 
     "psr/http-client": "^1.0",
-    "psr/http-message": "^1.0||^2.0"
+    "psr/http-message": "^1.0||^2.0",
+    "symfony/polyfill-php84": "^1.0"
   },
 
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.75.0",
-    "phpstan/phpstan": "^2.1.16",
-    "phpstan/phpstan-phpunit": "^2.0.6",
-    "phpunit/phpcov": "^9.0.2",
-    "phpunit/phpunit": "^10.5.46",
-    "shipmonk/composer-dependency-analyser": "^1.8.3"
+    "friendsofphp/php-cs-fixer": "^3.92.3",
+    "phpstan/phpstan": "^2.1.33",
+    "phpstan/phpstan-phpunit": "^2.0.11",
+    "phpunit/phpcov": "^11.0.3",
+    "phpunit/phpunit": "^12.5.4",
+    "shipmonk/composer-dependency-analyser": "^1.8.4"
   }
 }

@@ -89,7 +89,6 @@ class HttpClient implements ClientInterface
                 $errno = $curl->getErrorNumber();
 
                 //~ Close connection & stream
-                $curl->close();
                 fclose($streamResource);
 
                 throw new HttpClientException(
@@ -102,8 +101,6 @@ class HttpClient implements ClientInterface
                     $errno,
                 );
             }
-
-            $curl->close();
 
             // Create stream & move pointer after header position in "stream".
             $stream = $this->httpFactory->createStreamFromResource($streamResource);
